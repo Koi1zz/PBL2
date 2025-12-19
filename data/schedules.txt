@@ -1,0 +1,17 @@
+Idp: 101 | Idm: 1 | Rooms: P01 | Date: 09:00,15/01/2025
+Idp: 102 | Idm: 1 | Rooms: P01 | Date: 14:00,15/01/2025
+Idp: 103 | Idm: 1 | Rooms: P02 | Date: 19:00,15/01/2025
+Idp: 104 | Idm: 2 | Rooms: P01 | Date: 10:00,16/01/2025
+Idp: 105 | Idm: 2 | Rooms: P03 | Date: 15:30,16/01/2025
+Idp: 106 | Idm: 3 | Rooms: P02 | Date: 20:00,16/01/2025
+Idp: 107 | Idm: 4 | Rooms: P01 | Date: 09:30,17/01/2025
+Idp: 108 | Idm: 5 | Rooms: P02 | Date: 13:00,17/01/2025
+Idp: 109 | Idm: 6 | Rooms: P03 | Date: 18:00,17/01/2025
+Idp: 110 | Idm: 7 | Rooms: P01 | Date: 11:00,18/01/2025
+Idp: 111 | Idm: 8 | Rooms: P02 | Date: 16:00,18/01/2025
+Idp: 112 | Idm: 9 | Rooms: P03 | Date: 21:00,18/01/2025
+Idp: 113 | Idm: 10 | Rooms: P01 | Date: 10:30,19/01/2025
+Idp: 114 | Idm: 11 | Rooms: P02 | Date: 14:30,19/01/2025
+Idp: 115 | Idm: 12 | Rooms: P03 | Date: 19:30,19/01/2025
+Idp: 116 | Idm: 13 | Rooms: P01 | Date: 09:00,20/01/2025
+Idp: 111 | Idm: 102 | Rooms: H101 | Date: 19:00,22/11/2025
