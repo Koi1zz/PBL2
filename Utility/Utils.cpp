@@ -4,6 +4,13 @@
 #include <sstream>
 #include <iomanip>
 #include <cctype>
+#ifdef _WIN32
+    #include <conio.h>
+#else
+    #include <termios.h>
+    #include <unistd.h>
+#endif
+#include <iostream>
 using namespace std;
 
 // Khai bao bien toan cuc
@@ -11,7 +18,7 @@ MyVector<NgayLeInfo> danhSachNgayLe;
 
 // Ham khoi tao danh sach ngay le
 void khoiTaoNgayLe() {
-    // Chi khoi tao 1 lan
+
     static bool daKhoiTao = false;
     if (daKhoiTao) return;
 
@@ -97,4 +104,29 @@ pair<int, int> seatToIndex(const string& seat) {
     } catch (...) {
         return {-1, -1};
     }
+}
+string nhapPassword() {
+    string password = "";
+    char ch;
+
+    while (true) {
+        ch = _getch();
+
+        if (ch == 13) {
+            cout << endl;
+            break;
+        }
+        else if (ch == 8) {
+            if (!password.empty()) {
+                password.pop_back();
+                cout << "\b \b";
+            }
+        }
+        else {
+            password += ch;
+            cout << '*';
+        }
+    }
+
+    return password;
 }

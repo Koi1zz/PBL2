@@ -1,6 +1,7 @@
 #include "Database/Database.h"
 #include "Others/User.h"
 #include "Others/Admin.h"
+#include "Utility/Utils.h"
 #include <iostream>
 #include <limits>
 using namespace std;
@@ -33,10 +34,11 @@ int main() {
                 cout << "\n============= MENU LOGIN ==============="<< endl;
                 cout << "Username : ";
                 cin >> username;
+                cin.ignore();
 
                 cout << "Password: ";
-                cin >> password;
-
+                password = nhapPassword();
+                
                 if (!db.kiemTraDangNhap(username, password)) {
                     cout << "\nDang nhap that bai! Sai username hoac password.\n";
                     continue;
@@ -111,10 +113,10 @@ int main() {
 
                                 string password, confirmPassword;
                                 cout << "Password: ";
-                                getline(cin, password);
+                                password = nhapPassword();
 
                                 cout << "Xac nhan password: ";
-                                getline(cin, confirmPassword);
+                                confirmPassword = nhapPassword();
 
                                 if (password != confirmPassword) {
                                     cout << "Password xac nhan khong khop!\n";
@@ -211,9 +213,9 @@ int main() {
                 getline(cin, newUser.username);
                 string password, confirmPassword;
                 cout << "Password: ";
-                getline(cin, password);
+                password = nhapPassword();
                 cout << "Xac nhan password: ";
-                getline(cin, confirmPassword);
+                confirmPassword = nhapPassword();
 
                 if (newUser.ten.empty() || newUser.sdt.empty() || newUser.email.empty() ||
                     newUser.username.empty() || password.empty()) {
@@ -255,5 +257,3 @@ int main() {
     }
     return 0;
 }
-
-
