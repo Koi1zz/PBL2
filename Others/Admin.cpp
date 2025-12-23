@@ -1,9 +1,12 @@
 #include "Admin.h"
+#include "Utility/Utils.h"
 #include <iostream>
 #include <limits>
 #include <iomanip>
 using namespace std;
 Admin::Admin(const string& uname, Database& database) : User(uname, database) {}
+
+// Them phim moi
 void Admin::themPhim() {
     int id, thoiluong;
     string ten, theloai;
@@ -31,6 +34,7 @@ void Admin::themPhim() {
     cout << "Adding Successfully!\n";
 }
 
+// Xoa phim
 void Admin::xoaPhim() {
     cout << "Id you want to remove: ";
     int id;
@@ -44,6 +48,8 @@ void Admin::xoaPhim() {
     db.removePhim(id);
     cout << "Delete Successfully!\n";
 }
+
+// them Lich Chieu
 void Admin::themLichChieu() {
     int id, idPhim;
     string phong, ngay, gio;
@@ -65,9 +71,15 @@ void Admin::themLichChieu() {
     getline(cin, phong);
     cout << "Date (dd/mm/yyyy): ";
     getline(cin, ngay);
+
+    if (!isValidDate(ngay)) {
+        cout << "Ngay khong hop le! Khong the tao lich chieu trong qua khu.\n";
+        return;
+    }
+    
     cout << "Times (hh:mm): ";
     getline(cin, gio);
-    // Kiểm tra trùng lịch
+
     for (auto &lich : db.getDsLich()) {
         if (lich.getPhong() == phong && lich.getNgay() == ngay && lich.getGio() == gio) {
             cout << "Existed!\n";
@@ -78,6 +90,8 @@ void Admin::themLichChieu() {
     db.addLichChieu(lc);
     cout << "Adding Successfully!\n";
 }
+
+// hien thi lich
 void Admin::hienThiLichChieu() {
     cout << "\n===== Schedules =====\n";
     for (auto &lc : db.getDsLich()) {
@@ -88,6 +102,8 @@ void Admin::hienThiLichChieu() {
              << " | " << lc.getNgay() << " " << lc.getGio() << "\n";
     }
 }
+
+// xem tat ca cac ve
 void Admin::xemTatCaVe() {
     cout << "\n===== List of Tickets =====\n";
     for (auto &v : db.getDsVe()) {
@@ -100,13 +116,17 @@ void Admin::xemTatCaVe() {
     }
 }
 
+// dat ve (chi admin xem duoc)
 void Admin::datVe() {
     cout << "Admin Only.\n";
 }
+
+// xem ve (chi danh cho admin)
 void Admin::xemVe() {
     cout << "Admin Only.\n";
 }
 
+// xem tat ca user
 void Admin::xemDanhSachUser() {
     MyVector<UserInfo> dsUser = db.getDanhSachUser();
 
@@ -132,6 +152,7 @@ void Admin::xemDanhSachUser() {
     }
 }
 
+// thong ke he thong
 void Admin::thongKe() {
     cout << "\n";
     cout << string(80, '=') << "\n";

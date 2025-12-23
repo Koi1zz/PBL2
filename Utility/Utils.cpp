@@ -105,6 +105,8 @@ pair<int, int> seatToIndex(const string& seat) {
         return {-1, -1};
     }
 }
+
+// nhap password an
 string nhapPassword() {
     string password = "";
     char ch;
@@ -129,4 +131,32 @@ string nhapPassword() {
     }
 
     return password;
+}
+
+// kiem tra ngay co hop le hay k
+bool isValidDate(const string& ngay) {
+    // Lay ngay hien tai
+    time_t now = time(0);
+    tm* timeNow = localtime(&now);
+    
+    // Parse ngay nhap vao (dd/mm/yyyy)
+    tm timeInput = {};
+    istringstream ss(ngay);
+    ss >> get_time(&timeInput, "%d/%m/%Y");
+    
+    if (ss.fail()) {
+        return false; // Dinh dang khong hop le
+    }
+    
+    // Chuyen thanh time_t de so sanh
+    time_t inputTime = mktime(&timeInput);
+    
+    // So sanh: chi lay phan ngay, bo qua gio phut giay
+    timeNow->tm_hour = 0;
+    timeNow->tm_min = 0;
+    timeNow->tm_sec = 0;
+    time_t todayTime = mktime(timeNow);
+    
+    // Ngay nhap vao phai >= ngay hom nay
+    return (inputTime >= todayTime);
 }

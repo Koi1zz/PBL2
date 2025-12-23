@@ -32,5 +32,8 @@ bool isNgayLe(const string& ngay);
 
 // Xu ly ghe
 pair<int, int> seatToIndex(const string& seat);
-string nhapPassword();  // Nháº­p password áº©n
+string nhapPassword();
+
+// Kiem tra ngay co hop le hay k
+bool isValidDate(const string& date);
 #endif
