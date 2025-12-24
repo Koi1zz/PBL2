@@ -340,16 +340,6 @@ bool Database::emailTonTai(const string& email) {
     }
     return false;
 }
-//bool Database::dangKyTaiKhoan(const string& username, const string& password, bool isAdmin) {
-//    if (taiKhoanTonTai(username)) {
-//        return false;
-//    }
-//
-//    dsTaiKhoan[username] = password;
-//    isAdminMap[username] = isAdmin;
-//    luuTaiKhoan();
-//    return true;
-//}
 bool Database::dangKyTaiKhoan(const UserInfo& userInfo) {
     if (taiKhoanTonTai(userInfo.username) ||
         sdtTonTai(userInfo.sdt) ||

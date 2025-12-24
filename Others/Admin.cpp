@@ -17,12 +17,17 @@ void Admin::themPhim() {
         cout << "Wrong Numbers: ";
     }
     cin.ignore();
-    cout << "Names: ";
-    getline(cin, ten);
-    cout << "Genres: ";
-    getline(cin, theloai);
+    Phim* phimTrung = db.findPhimById(id);
+    if (phimTrung != nullptr) {
+        cout << "Trung ID voi phim \"" << phimTrung->getTen()
+             << "\" da co!\n";
+        cout << "Vui long chon ID khac.\n";
+        return;
+    }
+    ten = nhapChuoiKhongRong("Names: ");
+    theloai = nhapChuoiKhongRong("Genres: ");
     cout << "Lengths (Minutes): ";
-    while (!(cin >> thoiluong)) {
+    while (!(cin >> thoiluong|| thoiluong <= 0)) {
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
         cout << "Wrong Choice: ";
@@ -44,13 +49,37 @@ void Admin::xoaPhim() {
         cout << "Wrong Numbers: ";
     }
     cin.ignore();
+    Phim* phim = db.findPhimById(id);
+    if (phim == nullptr) {
+        cout << "Khong co phim nay de xoa!\n";
+        cout << "Vui long kiem tra lai ID.\n";
+        return;
+    }
+    cout << "\nThong tin phim se xoa:\n";
+    cout << "Ten: " << phim->getTen() << "\n";
+    cout << "The loai: " << phim->getTheLoai() << "\n";
 
+    cout << "\nBan co chac chan muon xoa? (y/n): ";
+    string confirm;
+    cin >> confirm;
+    cin.ignore();
+    if (toLower(trim(confirm)) != "y" && toLower(trim(confirm)) != "yes") {
+        cout << "Da huy thao tac xoa.\n";
+        return;
+    }
     db.removePhim(id);
     cout << "Delete Successfully!\n";
 }
 
 // them Lich Chieu
 void Admin::themLichChieu() {
+    cout << "\n===== DANH SACH PHIM =====\n";
+    for (int i = 0; i < db.getDsPhim().size(); i++) {
+        Phim& p = db.getDsPhim()[i];
+        cout << "ID: " << p.getId() << " - " << p.getTen() << "\n";
+    }
+    cout << "\n";
+
     int id, idPhim;
     string phong, ngay, gio;
 
@@ -60,6 +89,14 @@ void Admin::themLichChieu() {
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
         cout << "Wrong Numbers: ";
     }
+
+    LichChieu* lichKiemTra = db.findLichById(id);
+    if (lichKiemTra != nullptr) {
+        cout << "ID lich chieu " << id << " da ton tai!\n";
+        cout << "Vui long chon ID khac.\n";
+        return;
+    }
+
     cout << "Id Movies: ";
     while (!(cin >> idPhim)) {
         cin.clear();
@@ -67,6 +104,15 @@ void Admin::themLichChieu() {
         cout << "Wrong Numbers: ";
     }
     cin.ignore();
+
+    // KIỂM TRA PHIM CÓ TỒN TẠI KHÔNG
+    Phim* phimKiemTra = db.findPhimById(idPhim);
+    if (phimKiemTra == nullptr) {
+        cout << "Khong co phim co ID " << idPhim << " trong danh sach phim hien co!\n";
+        cout << "Vui long kiem tra lai danh sach phim truoc khi tao lich chieu.\n";
+        return;
+    }
+
     cout << "Rooms: ";
     getline(cin, phong);
     cout << "Date (dd/mm/yyyy): ";
@@ -76,10 +122,13 @@ void Admin::themLichChieu() {
         cout << "Ngay khong hop le! Khong the tao lich chieu trong qua khu.\n";
         return;
     }
-    
+
     cout << "Times (hh:mm): ";
     getline(cin, gio);
-
+    if (!isValidTime(gio)) {
+    cout << "Gio khong hop le! Vui long nhap dung dinh dang hh:mm (vd: 09:00)\n";
+    return;
+}
     for (auto &lich : db.getDsLich()) {
         if (lich.getPhong() == phong && lich.getNgay() == ngay && lich.getGio() == gio) {
             cout << "Existed!\n";
@@ -93,27 +142,81 @@ void Admin::themLichChieu() {
 
 // hien thi lich
 void Admin::hienThiLichChieu() {
-    cout << "\n===== Schedules =====\n";
-    for (auto &lc : db.getDsLich()) {
+    // Chuẩn bị headers
+    MyVector<string> headers;
+    headers.push_back("ID");
+    headers.push_back("Ten Phim");
+    headers.push_back("Phong");
+    headers.push_back("Ngay");
+    headers.push_back("Gio");
+
+    // Chuẩn bị độ rộng cột
+    MyVector<int> columnWidths;
+    columnWidths.push_back(5);   // ID
+    columnWidths.push_back(35);  // Tên phim
+    columnWidths.push_back(8);   // Phòng
+    columnWidths.push_back(12);  // Ngày
+    columnWidths.push_back(8);   // Giờ
+
+    // Chuẩn bị dữ liệu
+    MyVector<MyVector<string>> data;
+    for (int i = 0; i < db.getDsLich().size(); i++) {
+        LichChieu& lc = db.getDsLich()[i];
         Phim* p = db.findPhimById(lc.getIdPhim());
         string tenPhim = p ? p->getTen() : "Unknown";
 
-        cout << lc.getId() << " | " << tenPhim << " | " << lc.getPhong()
-             << " | " << lc.getNgay() << " " << lc.getGio() << "\n";
+        MyVector<string> row;
+        row.push_back(to_string(lc.getId()));
+        row.push_back(tenPhim);
+        row.push_back(lc.getPhong());
+        row.push_back(lc.getNgay());
+        row.push_back(lc.getGio());
+
+        data.push_back(row);
     }
+
+    drawTable("DANH SACH LICH CHIEU", headers, data, columnWidths);
 }
 
-// xem tat ca cac ve
 void Admin::xemTatCaVe() {
-    cout << "\n===== List of Tickets =====\n";
-    for (auto &v : db.getDsVe()) {
+    MyVector<string> headers;
+    headers.push_back("User");
+    headers.push_back("Phim");
+    headers.push_back("Phong");
+    headers.push_back("Ghe");
+    headers.push_back("Gia");
+    headers.push_back("Ngay");
+    headers.push_back("Gio");
+    MyVector<int> columnWidths;
+    columnWidths.push_back(12);  // User
+    columnWidths.push_back(30);  // Phim
+    columnWidths.push_back(8);   // Phòng
+    columnWidths.push_back(6);   // Ghế
+    columnWidths.push_back(10);  // Giá
+    columnWidths.push_back(12);  // Ngày
+    columnWidths.push_back(8);   // Giờ
+
+    // Chuẩn bị dữ liệu
+    MyVector<MyVector<string>> data;
+    for (int i = 0; i < db.getDsVe().size(); i++) {
+        Ve& v = db.getDsVe()[i];
         Phim* p = db.findPhimById(v.getIdPhim());
         string tenPhim = p ? p->getTen() : "Unknown";
-        cout << "User: " << v.getUser() << " | Phim: " << tenPhim
-             << " | Rooms: " << v.getPhong() << " | Seats: " << v.getGhe()
-             << " | Price: " << v.getGiaVe() << " | Date: " << v.getNgay()
-             << " " << v.getGio() << "\n";
+
+        MyVector<string> row;
+        row.push_back(v.getUser());
+        row.push_back(tenPhim);
+        row.push_back(v.getPhong());
+        row.push_back(v.getGhe());
+        row.push_back(to_string(v.getGiaVe()));
+        row.push_back(v.getNgay());
+        row.push_back(v.getGio());
+
+        data.push_back(row);
     }
+
+    // Gọi hàm vẽ bảng
+    drawTable("DANH SACH TAT CA VE DA DAT", headers, data, columnWidths);
 }
 
 // dat ve (chi admin xem duoc)
@@ -130,33 +233,36 @@ void Admin::xemVe() {
 void Admin::xemDanhSachUser() {
     MyVector<UserInfo> dsUser = db.getDanhSachUser();
 
-    cout << "\n===== DANH SACH TAI KHOAN USER =====\n";
-    if (dsUser.empty()) {
-        cout << "Khong co tai khoan user nao!\n";
-        return;
-    }
-    
-    cout << setw(15) << left << "Username"
-         << setw(20) << "Ten"
-         << setw(15) << "SDT"
-         << setw(25) << "Email"
-         << "\n";
-    cout << string(75, '-') << "\n";
+    MyVector<string> headers;
+    headers.push_back("Username");
+    headers.push_back("Ten");
+    headers.push_back("SDT");
+    headers.push_back("Email");
 
-    for (auto &user : dsUser) {
-        cout << setw(15) << left << user.username
-             << setw(20) << user.ten
-             << setw(15) << user.sdt
-             << setw(25) << user.email
-             << "\n";
+    MyVector<int> columnWidths;
+    columnWidths.push_back(15);  // Username
+    columnWidths.push_back(25);  // Tên
+    columnWidths.push_back(15);  // SDT
+    columnWidths.push_back(30);  // Email
+
+    MyVector<MyVector<string>> data;
+    for (int i = 0; i < dsUser.size(); i++) {
+        MyVector<string> row;
+        row.push_back(dsUser[i].username);
+        row.push_back(dsUser[i].ten);
+        row.push_back(dsUser[i].sdt);
+        row.push_back(dsUser[i].email);
+
+        data.push_back(row);
     }
+    drawTable("DANH SACH TAI KHOAN USER", headers, data, columnWidths);
 }
 
 // thong ke he thong
 void Admin::thongKe() {
     cout << "\n";
     cout << string(80, '=') << "\n";
-    cout << setw(45) << " " << "THONG KE HE THONG\n";
+    cout << setw(35) << " " << "THONG KE HE THONG\n";
     cout << string(80, '=') << "\n\n";
 
     // 1. Thống kê tổng quan
@@ -180,9 +286,6 @@ void Admin::thongKe() {
     cout << "Tong doanh thu:      " << tongDoanhThu << " VND\n";
     cout << "Doanh thu trung binh/ve: " << (tongVe > 0 ? tongDoanhThu / tongVe : 0) << " VND\n\n";
 
-    // 3. Top 10 phim bán chạy nhất
-    cout << "===== TOP 10 PHIM BAN CHAY NHAT =====\n";
-    
     // Đếm số vé cho mỗi phim
     struct PhimStats {
         int idPhim;
@@ -190,9 +293,9 @@ void Admin::thongKe() {
         int soVe;
         int doanhThu;
     };
-    
+
     MyVector<PhimStats> stats;
-    
+
     for (int i = 0; i < db.getDsPhim().size(); i++) {
         Phim& p = db.getDsPhim()[i];
         PhimStats ps;
@@ -200,7 +303,7 @@ void Admin::thongKe() {
         ps.tenPhim = p.getTen();
         ps.soVe = 0;
         ps.doanhThu = 0;
-        
+
         // Đếm vé
         for (int j = 0; j < db.getDsVe().size(); j++) {
             if (db.getDsVe()[j].getIdPhim() == p.getId()) {
@@ -208,12 +311,12 @@ void Admin::thongKe() {
                 ps.doanhThu += db.getDsVe()[j].getGiaVe();
             }
         }
-        
+
         if (ps.soVe > 0) {
             stats.push_back(ps);
         }
     }
-    
+
     // Sắp xếp giảm dần theo số vé (bubble sort)
     for (int i = 0; i < stats.size() - 1; i++) {
         for (int j = 0; j < stats.size() - i - 1; j++) {
@@ -224,51 +327,32 @@ void Admin::thongKe() {
             }
         }
     }
-    
-    // Hiển thị top 10
-    const int sttWidth = 5;
-    const int tenWidth = 35;
-    const int soVeWidth = 10;
-    const int doanhThuWidth = 15;
-    
-    cout << "+";
-    cout << string(sttWidth + 2, '-') << "+";
-    cout << string(tenWidth + 2, '-') << "+";
-    cout << string(soVeWidth + 2, '-') << "+";
-    cout << string(doanhThuWidth + 2, '-') << "+\n";
-    
-    cout << "| " << setw(sttWidth) << left << "STT"
-         << " | " << setw(tenWidth) << left << "Ten Phim"
-         << " | " << setw(soVeWidth) << left << "So Ve"
-         << " | " << setw(doanhThuWidth) << left << "Doanh Thu"
-         << " |\n";
-    
-    cout << "+";
-    cout << string(sttWidth + 2, '-') << "+";
-    cout << string(tenWidth + 2, '-') << "+";
-    cout << string(soVeWidth + 2, '-') << "+";
-    cout << string(doanhThuWidth + 2, '-') << "+\n";
-    
+    MyVector<string> headers;
+    headers.push_back("STT");
+    headers.push_back("Ten Phim");
+    headers.push_back("So Ve");
+    headers.push_back("Doanh Thu");
+
+    MyVector<int> columnWidths;
+    columnWidths.push_back(5);
+    columnWidths.push_back(35);
+    columnWidths.push_back(10);
+    columnWidths.push_back(15);
+
+    MyVector<MyVector<string>> data;
     int limit = stats.size() < 10 ? stats.size() : 10;
+
     for (int i = 0; i < limit; i++) {
-        string ten = stats[i].tenPhim;
-        if (ten.length() > tenWidth) {
-            ten = ten.substr(0, tenWidth - 3) + "...";
-        }
-        
-        cout << "| " << setw(sttWidth) << left << (i + 1)
-             << " | " << setw(tenWidth) << left << ten
-             << " | " << setw(soVeWidth) << left << stats[i].soVe
-             << " | " << setw(doanhThuWidth) << left << stats[i].doanhThu
-             << " |\n";
+        MyVector<string> row;
+        row.push_back(to_string(i + 1));
+        row.push_back(stats[i].tenPhim);
+        row.push_back(to_string(stats[i].soVe));
+        row.push_back(to_string(stats[i].doanhThu) + " VND");
+
+        data.push_back(row);
     }
-    
-    cout << "+";
-    cout << string(sttWidth + 2, '-') << "+";
-    cout << string(tenWidth + 2, '-') << "+";
-    cout << string(soVeWidth + 2, '-') << "+";
-    cout << string(doanhThuWidth + 2, '-') << "+\n";
-    
+    drawTable("TOP 10 PHIM BAN CHAY NHAT", headers, data, columnWidths);
+
     cout << "\nNhan Enter de tiep tuc...";
     cin.get();
 }

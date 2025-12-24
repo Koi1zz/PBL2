@@ -36,4 +36,21 @@ string nhapPassword();
 
 // Kiem tra ngay co hop le hay k
 bool isValidDate(const string& date);
+bool isValidTime(const string& gio);
+
+// ve duong ngang
+string nhapChuoiKhongRong(const string& prompt);
+
+void drawTableLine(const MyVector<int>& columnWidths);
+
+// Ve header bang
+void drawTableHeader(const MyVector<string>& headers, const MyVector<int>& columnWidths);
+
+// Ve 1 hang du lieu
+void drawTableRow(const MyVector<string>& rowData, const MyVector<int>& columnWidths);
+
+void drawTable(const string& title,
+               const MyVector<string>& headers,
+               const MyVector<MyVector<string>>& data,
+               const MyVector<int>& columnWidths);
 #endif
